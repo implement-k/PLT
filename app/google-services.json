@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "384749001943",
+    "project_id": "pseudolocationtracker",
+    "storage_bucket": "pseudolocationtracker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384749001943:android:64f8f5967cbcb156cfe492",
+        "android_client_info": {
+          "package_name": "com.cmon.pseudoLocationTracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "384749001943-mrth6a88bhe0qg5rmb97htn5k85hbb97.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUuj6P4jzfanuc2L9rgLzGxN0b9w_SRko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "384749001943-mrth6a88bhe0qg5rmb97htn5k85hbb97.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
