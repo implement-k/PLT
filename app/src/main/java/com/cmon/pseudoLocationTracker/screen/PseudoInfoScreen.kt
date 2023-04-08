@@ -194,30 +194,32 @@ fun PseudoInfoScreen(
                     )
                     .padding(10.dp)
             )
-            Text(
-                text = stringResource(id = R.string.RelativeInstitutions),
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                ),
-                modifier = Modifier.padding(start = 20.dp, top = 16.dp, end = 16.dp)
-            )
-            Text(
-                text = pseudo.RelativeInstitutions,
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                ),
-                lineHeight = 20.sp,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxSize()
-                    .background(
-                        color = MaterialTheme.colors.surface,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .padding(10.dp)
-            )
+            if (pseudo.RelativeInstitutions != null) {
+                Text(
+                    text = stringResource(id = R.string.RelativeInstitutions),
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                    ),
+                    modifier = Modifier.padding(start = 20.dp, top = 16.dp, end = 16.dp)
+                )
+                Text(
+                    text = pseudo.RelativeInstitutions,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                    ),
+                    lineHeight = 20.sp,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxSize()
+                        .background(
+                            color = MaterialTheme.colors.surface,
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .padding(10.dp)
+                )
+            }
             Column(
                 modifier = Modifier.padding(start = 20.dp,end = 20.dp, top = 10.dp, bottom = 5.dp)
             ){

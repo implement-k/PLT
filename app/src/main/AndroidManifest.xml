@@ -17,6 +17,8 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false"/>
+        <activity android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/Theme.AppCompat"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -3,6 +3,7 @@ package com.cmon.pseudoLocationTracker
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -10,9 +11,11 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 
 enum class Loc{
     TOP, MIDDLE, BOTTOM
@@ -55,5 +58,36 @@ fun DropDownMenuButton(
             style = MaterialTheme.typography.body1
         )
         Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun PseudoCheckListButton(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = { navController.navigate("pseudo_checklist_screen") },
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.surface,
+            contentColor = MaterialTheme.colors.onSurface
+        ),
+        elevation = ButtonDefaults.elevation(
+            defaultElevation = 20.dp,
+            pressedElevation = 0.dp,
+            disabledElevation = 0.dp
+        ),
+        modifier = modifier
+            .padding(10.dp)
+            .height(55.dp)
+    ) {
+        Text(
+            text = stringResource(id = R.string.choose_pseudo),
+            style = MaterialTheme.typography.body2,
+            modifier = Modifier
+                .padding(start = 5.dp, end = 5.dp)
+                .align(Alignment.CenterVertically)
+        )
     }
 }

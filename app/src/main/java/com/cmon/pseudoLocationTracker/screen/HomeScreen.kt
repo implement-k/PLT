@@ -5,11 +5,8 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -47,8 +44,8 @@ import com.google.android.gms.maps.GoogleMapOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.maps.android.compose.*
 
-var point = LatLng(36.34, 127.77)
-var zoom = 7f
+var Point = LatLng(36.34, 127.77)
+var Zoom = 7f
 
 
 @Composable
@@ -59,7 +56,7 @@ fun HomeScreen(
     checkedList: SnapshotStateList<Boolean>
 ) {
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(point, zoom)
+        position = CameraPosition.fromLatLngZoom(Point, Zoom)
     }
     val focusManager = LocalFocusManager.current
     var searchInput by remember { mutableStateOf("") }
@@ -81,26 +78,20 @@ fun HomeScreen(
     val cRotaionState by animateFloatAsState(
         targetValue = if (searchChurchExtended) 180f else 0f
     )
-    val pseudoScrollState = rememberScrollState()
-    val addressScrollSate = rememberScrollState()
 
-    var isMoved by remember {
-        mutableStateOf(false)
-    }
+    var isMoved by remember { mutableStateOf(false) }
 
     Box{
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
-                isBuildingEnabled = true,
                 isIndoorEnabled = false,
                 minZoomPreference = 7f
             ),
             uiSettings = MapUiSettings(
                 tiltGesturesEnabled = false
-            ),
-
+            )
         ) {
             for ((i, pseudo) in pseudoList.withIndex()){
                 if (checkedList[i]) {
@@ -218,74 +209,57 @@ fun HomeScreen(
                         LaunchedEffect(key1 = true) {
                             cameraPositionState.animate(
                                 update = CameraUpdateFactory.newCameraPosition(
-                                    CameraPosition(point, zoom, 0f, 0f)
+                                    CameraPosition(Point, Zoom, 0f, 0f)
                                 ),
                                 durationMs = 1000
                             )
                             if (!cameraPositionState.isMoving)  isMoved = false
                         }
                     }
-                    SearchResultCard(
-                        searchInput.length, searchInput.isNotEmpty(), searchInput, pseudoList,
-                        searchReligionExtended, {
+                    SearchResult(
+                        searchInputSize = searchInput.length,
+                        isEnabled = searchInput.isNotEmpty(),
+                        searchInput = searchInput,
+                        pseudoList = pseudoList,
+                        religionExtended = searchReligionExtended,
+                        onReligionClick = {
                             searchReligionExtended = !searchReligionExtended
                             focusManager.clearFocus()
                                                 },
-                        searchChurchExtended, {
+                        churchExtended = searchChurchExtended,
+                        onChurchClick = {
                             searchChurchExtended = !searchChurchExtended
                             focusManager.clearFocus()
                                               },
-                        rRotationState, cRotaionState, navController,{ p, z -> point = p
-                            zoom = z
+                        religionRotationState = rRotationState,
+                        churchRotationState = cRotaionState,
+                        navController = navController,
+                        onAddressClick = { latlng, zoom ->
+                            Point = latlng
+                            Zoom = zoom
                             isMoved = true
                             focusManager.clearFocus()
-                            searchInput = ""},pseudoScrollState,addressScrollSate)}
+                            searchInput = ""
+                            searchReligionExtended = false
+                            searchChurchExtended = false
+                        }
+                    )
+                }
                 SearchBar(
                     keyboardActions = KeyboardActions(
-                        onDone = { focusManager.clearFocus() }
+                        onDone = { focusManager.clearFocus()
+                            searchReligionExtended = false
+                            searchChurchExtended = false }
                     ),
                     value = searchInput,
-                    onValueChange = { searchInput = it }
+                    onValueChange = { searchInput = it },
+                    onCancelClick = {searchInput = ""},
+                    isSearch = searchInput.isNotEmpty()
                 )
             }
         }
     }
 }
-
-
-
-@Composable
-fun PseudoCheckListButton(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = { navController.navigate("pseudo_checklist_screen") },
-        shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.surface,
-            contentColor = MaterialTheme.colors.onSurface
-        ),
-        elevation = ButtonDefaults.elevation(
-            defaultElevation = 20.dp,
-            pressedElevation = 0.dp,
-            disabledElevation = 0.dp
-        ),
-        modifier = modifier
-            .padding(10.dp)
-            .height(55.dp)
-    ) {
-        Text(
-            text = stringResource(id = R.string.choose_pseudo),
-            style = MaterialTheme.typography.body2,
-            modifier = Modifier
-                .padding(start = 5.dp, end = 5.dp)
-                .align(Alignment.CenterVertically)
-        )
-    }
-}
-
-
 
 @Composable
 fun DropDownMenuButton(
@@ -379,8 +353,7 @@ fun DropDownMenuButton(
             value = text,
             onValueChange = { text = it },
             keyboardAction = KeyboardActions(
-                onNext = { focusManager.clearFocus()},
-                onDone = {  /*위치검색기능*/}
+                onNext = { focusManager.clearFocus()}
             ),
             cancelClick = {
                 openDialog.value = false
@@ -461,45 +434,67 @@ fun DropDownMenuButton(
 fun SearchBar(
     keyboardActions: KeyboardActions,
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    onCancelClick: () -> Unit,
+    isSearch: Boolean
 ) {
     val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
         focusedBorderColor = MaterialTheme.colors.secondary,
         unfocusedBorderColor =  MaterialTheme.colors.surface ,
         backgroundColor =  MaterialTheme.colors.surface )
 
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = { Text(
-            text = stringResource(id = R.string.search_label),
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp
-            ),
-        ) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = keyboardActions,
-        leadingIcon = {
-            Icon(
-                painter = painterResource(id = R.drawable.search_icon),
-                contentDescription = stringResource(id = R.string.search),
-                modifier = Modifier
-                    .size(20.dp)
-            )
-        },
-        shape = RoundedCornerShape(50),
-        colors = textFieldColors,
-        textStyle = TextStyle(lineHeight = 10.sp),
+    Box(
+        contentAlignment = Alignment.CenterEnd,
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 10.dp)
             .height(60.dp)
             .shadow(elevation = 20.dp, RoundedCornerShape(20.dp)),
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = { Text(
+                text = stringResource(id = R.string.search_label),
+                style = TextStyle(
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp
+                ),
+            ) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = keyboardActions,
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.search_icon),
+                    contentDescription = stringResource(id = R.string.search),
+                    modifier = Modifier
+                        .size(20.dp)
+                )
+            },
+            shape = RoundedCornerShape(50),
+            colors = textFieldColors,
+            textStyle = TextStyle(lineHeight = 10.sp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+
         )
+        if (isSearch) {
+            IconButton(
+                onClick = onCancelClick,
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .size(20.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.close_icon),
+                    contentDescription = null,
+                )
+            }
+        }
+    }
 }

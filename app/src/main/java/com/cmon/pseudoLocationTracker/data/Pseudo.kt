@@ -20,6 +20,7 @@ data class Pseudo (
 )
 
 data class PseudoAddress (
+    val pseudoName: String,
     val name: String,
     val address: String,
     val latlng: LatLng

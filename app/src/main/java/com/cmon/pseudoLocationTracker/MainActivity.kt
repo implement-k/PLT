@@ -72,6 +72,7 @@ fun PLTapp(
         .addOnSuccessListener { documents ->
             for (document in documents) {
                 if (document != null) {
+                    val name = document.get("name").toString()
                     val addressList = mutableStateListOf<PseudoAddress>()
                     pseudo_location
                         .document(document.id)
@@ -85,6 +86,7 @@ fun PLTapp(
                                         val lat = geoPoint.latitude
                                         val long = geoPoint.longitude
                                         addressList.add(PseudoAddress(
+                                            pseudoName = name,
                                             name = doc.get("name").toString(),
                                             address = doc.id,
                                             latlng = LatLng(lat, long)
@@ -112,7 +114,7 @@ fun PLTapp(
                     }
                     pseudoList.add(
                         Pseudo(
-                            pseudoName = document.get("name").toString(),
+                            pseudoName = name,
                             representative = document.get("representative").toString(),
                             initiator = document.get("initiator").toString(),
                             site = document.get("site").toString(),
@@ -160,7 +162,7 @@ fun PLTapp(
                 onAllTrueChange, onAllFalseChange) }
         composable("report_screen") { ReportScreen(navController, db) }
         composable("standard_screen") { StandardScreen(navController) }
-        composable("info_screen") { InfoScreen(navController) }
+        composable("info_screen") { InfoScreen(navController)}
         composable("pseudo_info_screen") { PseudoInfoScreen(navController, Pseudo) }
         composable("first_screen") { FirstScreen() {
             preferences.edit().putBoolean(PREF_KEY_FIRST_LAUNCH, false).apply()

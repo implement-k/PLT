@@ -1,6 +1,7 @@
 package com.cmon.pseudoLocationTracker.screen
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -22,12 +24,15 @@ import androidx.navigation.NavController
 import com.cmon.pseudoLocationTracker.Pseudo
 import com.cmon.pseudoLocationTracker.R
 import com.cmon.pseudoLocationTracker.nullPseudo
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.google.api.Context
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun InfoScreen(
     navController: NavController
 ) {
+
     Scaffold(
         topBar = {
             TopBar(navController = navController)
@@ -72,20 +77,6 @@ fun InfoScreen(
                 }
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally){
-                Button(
-                    onClick = {/*TODO 오픈소스 정보*/},
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.surface,
-                        contentColor = MaterialTheme.colors.onSurface
-                    ),
-                    shape = RoundedCornerShape(50),
-                    elevation = ButtonDefaults.elevation(0.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.open_source_info),
-                        style = MaterialTheme.typography.body1
-                    )
-                }
                 Text(
                     text = stringResource(id = R.string.inquiry),
                     style = TextStyle(

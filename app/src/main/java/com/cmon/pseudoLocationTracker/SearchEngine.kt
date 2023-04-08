@@ -1,14 +1,15 @@
 package com.cmon.pseudoLocationTracker
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -30,7 +31,7 @@ import com.cmon.pseudoLocationTracker.data.PseudoAddress
 import com.google.android.gms.maps.model.LatLng
 
 @Composable
-fun SearchResultCard(
+fun SearchResult(
     searchInputSize: Int,
     isEnabled: Boolean,
     searchInput: String,
@@ -39,228 +40,117 @@ fun SearchResultCard(
     onReligionClick: () -> Unit,
     churchExtended: Boolean,
     onChurchClick: () -> Unit,
-    rRotationState: Float,
-    cRotationState: Float,
+    religionRotationState: Float,
+    churchRotationState: Float,
     navController: NavController,
     onAddressClick: (LatLng, Float) -> Unit,
-    rScrollState: ScrollState,
-    cScrollState: ScrollState,
 ) {
-    var isAddressResult by remember { mutableStateOf(false) }
-    val selectedAddressCard = mutableListOf<Any>()
+    val searchResultsModifier = Modifier
+        .padding(16.dp)
+        .fillMaxWidth()
+        .background(
+            color = MaterialTheme.colors.background,
+            shape = RoundedCornerShape(20.dp)
+        )
+        .animateContentSize(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        )
 
     if (isEnabled && searchInputSize >= 2) {
         val pseudoSearchList = mutableListOf<Pseudo>()
         val addressSearchList = mutableListOf<PseudoAddress>()
-        val addressPseudo = mutableListOf<String>()
+
+        val addResultFunction: (Pseudo) -> Unit = {pseudo ->
+            pseudoSearchList.add(pseudo)
+            addressSearchList.addAll(pseudo.address)
+        }
 
         for (pseudo in pseudoList) {
-            if (compareString(pseudo.pseudoName, searchInput))
-                if (!pseudoSearchList.contains(pseudo)) pseudoSearchList.add(pseudo)
-            if (compareString(pseudo.location, searchInput))
-                if (!pseudoSearchList.contains(pseudo)) pseudoSearchList.add(pseudo)
-            if (compareString(pseudo.RelativeInstitutions, searchInput))
-                if (!pseudoSearchList.contains(pseudo)) pseudoSearchList.add(pseudo)
-            if (compareString(pseudo.initiator, searchInput))
-                if (!pseudoSearchList.contains(pseudo)) pseudoSearchList.add(pseudo)
-            if (compareString(pseudo.representative, searchInput))
-                if (!pseudoSearchList.contains(pseudo)) pseudoSearchList.add(pseudo)
+            if (!pseudoSearchList.contains(pseudo)) {
+                if (compareString(pseudo.pseudoName, searchInput)) addResultFunction(pseudo)
+                if (compareString(pseudo.location, searchInput)) addResultFunction(pseudo)
+                if (compareString(pseudo.initiator, searchInput)) addResultFunction(pseudo)
+                if (compareString(pseudo.representative, searchInput)) addResultFunction(pseudo)
+            }
 
             for (loc in pseudo.address) {
-                if (compareString(loc.name, searchInput))
-                    if (!addressSearchList.contains(loc)) {
-                        addressSearchList.add(loc)
-                        addressPseudo.add(pseudo.pseudoName)
-                    }
-                if (compareString(loc.address, searchInput))
-                    if (!addressSearchList.contains(loc)) {
-                        addressSearchList.add(loc)
-                        addressPseudo.add(pseudo.pseudoName)
-                    }
+                if (!addressSearchList.contains(loc)) {
+                    if (compareString(loc.name, searchInput)) addressSearchList.add(loc)
+                    if (compareString(loc.address, searchInput)) addressSearchList.add(loc)
+                }
             }
-        }
-        if (pseudoSearchList.size == 0 && addressSearchList.size == 0) {
-            Text(
-                text = stringResource(id = R.string.no_results),
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                    shadow = Shadow(Color(0xFF000000), blurRadius = 3f),
-                    color = MaterialTheme.colors.surface
-                ),textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(start = 26.dp, end = 26.dp, top = 10.dp, bottom = 26.dp)
-                    .fillMaxWidth()
+        }//검색 일치하는 것 리스트에 추가
+
+        if (pseudoSearchList.size == 0 && addressSearchList.size == 0)
+            FloatingText(stringRes = R.string.no_results)
+        else if(pseudoSearchList.size != 0 || addressSearchList.size != 0){
+            PseudoSearchResults(
+                pseudo = pseudoSearchList,
+                isExtended = religionExtended,
+                isAddressExtended = churchExtended,
+                onExtendClick = onReligionClick,
+                rotationState = religionRotationState,
+                navController = navController,
+                modifier = searchResultsModifier
             )
-        }else if(pseudoSearchList.size != 0 || addressSearchList.size != 0){
-            PseudoSearchResults(pseudoSearchList, religionExtended, churchExtended,
-            onReligionClick, rRotationState, rScrollState, navController)
-            AddressSearchResults(
-                addressSearchList, churchExtended, religionExtended,
-                onChurchClick, cRotationState, onAddressClick,
-                addressPseudo, cScrollState,
-            ) { pa, r ->
-                isAddressResult = true
-                selectedAddressCard.add(pa)
-                selectedAddressCard.add(r)
-            }}
 
-    } else if (isEnabled) {
-        Text(
-            text = stringResource(id = R.string.more_than_two),
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp,
-                shadow = Shadow(Color(0xFF000000), blurRadius = 3f),
-                color = MaterialTheme.colors.surface
-            ),textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(start = 26.dp, end = 26.dp, top = 10.dp, bottom = 26.dp)
-                .fillMaxWidth()
-        )
-    }
-}
-
-fun compareString(original: String, target: String): Boolean {
-    if (original.length > target.length) {
-        if (original.contains(target)) return true
-    } else if (original.length == target.length) {
-        var cnt = 0
-        for (i in original.indices) {
-            if (original[i] != target[i]) cnt++
+            ChurchSearchResults(
+                addresses = addressSearchList,
+                isExtended = churchExtended,
+                isPseudoExtended = religionExtended,
+                onExtendClick = onChurchClick,
+                rotationState = churchRotationState,
+                onClick = onAddressClick,
+                modifier = searchResultsModifier
+            )
         }
-        if (cnt <= 1) return true
-    } else {
-        if (target.contains(original)) return true
-    }
-    return false
+    } else if (isEnabled)
+        FloatingText(stringRes = R.string.more_than_two)
+
+
 }
 
 @Composable
-fun AddressSearchResults(
-    locs: MutableList<PseudoAddress>,
+fun ChurchSearchResults(
+    addresses: MutableList<PseudoAddress>,
     isExtended: Boolean,
     isPseudoExtended: Boolean,
     onExtendClick: () -> Unit,
     rotationState: Float,
     onClick: (LatLng, Float) -> Unit,
-    locPseudo: MutableList<String>,
-    scrollState: ScrollState,
-    onCardClick: (PseudoAddress, String) -> Unit
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colors.background,
-                shape = RoundedCornerShape(20.dp)
-            )
-            .animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
-            )
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            if (locs.size > 0 && !isPseudoExtended) {
-                Text(
-                    text = stringResource(id = R.string.church),
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
-                    ),
-                    modifier = Modifier.padding(10.dp)
-                )
-            }
-            if (locs.size >= 3 && !isPseudoExtended) {
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = onExtendClick,modifier = Modifier.rotate(rotationState)) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.expand_more_icon),
-                        contentDescription = stringResource(R.string.expand_button_content_description),
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            }
-        }
-        if (locs.size > 0 && !isPseudoExtended) Divider(color = MaterialTheme.colors.surface)
+    Column(modifier = modifier) {
+        SearchResultBar(
+            stringRes = R.string.church,
+            listSize = addresses.size,
+            isOtherExtended = !isPseudoExtended,
+            onExtendClick = onExtendClick,
+            rotationState = rotationState
+        )
         if (isExtended && !isPseudoExtended) {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp)
-                    .verticalScroll(scrollState)
+                    .height(450.dp)
             ) {
-                for ((ii,i) in locs.withIndex()) {
-                    AddressResultCard(i, locPseudo[ii], onClick, onCardClick)
+                items(addresses) {
+                    ChurchResultCard(it, onClick)
                 }
             }
         } else if (!isPseudoExtended) {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (locs.size <= 2) {
-                    for ((ii, i) in locs.withIndex()) {
-                        AddressResultCard(i, locPseudo[ii], onClick, onCardClick)
-                    }
-                } else {
-                    for (i in 0..1) {
-                        AddressResultCard(locs[i], locPseudo[i],onClick, onCardClick)
-                    }
-                }
+                if (addresses.size <= 2)
+                    for (address in addresses) ChurchResultCard(address, onClick)
+                else
+                    for (i in 0..1) ChurchResultCard(addresses[i],onClick)
             }
         }
-    }
-}
-
-@Composable
-fun AddressResultCard(
-    pseudo: PseudoAddress,
-    religion: String,
-    onClick: (LatLng, Float) -> Unit,
-    onCardClick: (PseudoAddress, String) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = {
-                onClick(pseudo.latlng, 15f)
-                onCardClick(pseudo, religion)
-            })
-    ){
-        Text(
-            text = pseudo.name,
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            ),
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 1.dp)
-        )
-        Text(
-            text = religion,
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 11.sp
-            ),
-            modifier = Modifier
-                .padding(start = 10.dp, end = 10.dp, top = 3.dp, bottom = 1.dp)
-                .fillMaxWidth()
-        )
-        Text(
-            text = pseudo.address,
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 11.sp
-            ),
-            modifier = Modifier
-                .padding(start = 10.dp, end = 10.dp, top = 1.dp, bottom = 12.dp)
-                .fillMaxWidth()
-        )
     }
 }
 
@@ -271,81 +161,46 @@ fun PseudoSearchResults(
     isAddressExtended: Boolean,
     onExtendClick: () -> Unit,
     rotationState: Float,
-    scrollState: ScrollState,
-    navController: NavController
+    navController: NavController,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colors.background,
-                shape = RoundedCornerShape(20.dp)
-            )
-            .animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
-            )
+        modifier = modifier
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            if (pseudo.size > 0 && !isAddressExtended) {
-                Text(
-                    text = stringResource(id = R.string.religion),
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
-                    ),
-                    modifier = Modifier.padding(10.dp)
-                )
-            }
-            if (pseudo.size >= 2 && !isAddressExtended) {
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = onExtendClick,modifier = Modifier.rotate(rotationState)) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.expand_more_icon),
-                        contentDescription = stringResource(R.string.expand_button_content_description),
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            }
-        }
-        if (pseudo.size > 0 && !isAddressExtended) Divider(color = MaterialTheme.colors.surface)
-        if (isExtended && !isAddressExtended) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .verticalScroll(scrollState)
-            ) {
-                for (i in pseudo) {
-                    SearchResultCard(pseudo = i, navController = navController)
-                }
-            }
-        } else if (!isAddressExtended) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (pseudo.size <= 2) {
-                    for (i in pseudo) {
-                        SearchResultCard(i, navController)
+        SearchResultBar(
+            stringRes = R.string.religion,
+            listSize = pseudo.size,
+            isOtherExtended = !isAddressExtended,
+            onExtendClick = onExtendClick,
+            rotationState = rotationState
+        )
+        if (!isAddressExtended)
+            if (isExtended) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(450.dp)
+                ) {
+                    items(pseudo) {
+                        PseudoResultCard(it, navController)
                     }
-                } else {
-                    for (i in 0..1) {
-                        SearchResultCard(pseudo[i], navController)
-                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (pseudo.size <= 2)
+                        for (p in pseudo) PseudoResultCard(p, navController)
+                    else
+                        for (i in 0..1) PseudoResultCard(pseudo[i], navController)
                 }
             }
         }
     }
-}
+
 
 @Composable
-fun SearchResultCard(
+fun PseudoResultCard(
     pseudo: Pseudo,
     navController: NavController
 ) {
@@ -408,4 +263,116 @@ fun SearchResultCard(
             )
         }
     }
+}
+
+@Composable
+fun ChurchResultCard(
+    pseudo: PseudoAddress,
+    onClick: (LatLng, Float) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = { onClick(pseudo.latlng, 15f) })
+    ){
+        Text(
+            text = pseudo.name,
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+            ),
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 1.dp)
+        )
+        Text(
+            text = pseudo.pseudoName,
+            style = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 11.sp
+            ),
+            modifier = Modifier
+                .padding(start = 10.dp, end = 10.dp, top = 3.dp, bottom = 1.dp)
+                .fillMaxWidth()
+        )
+        Text(
+            text = pseudo.address,
+            style = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 11.sp
+            ),
+            modifier = Modifier
+                .padding(start = 10.dp, end = 10.dp, top = 1.dp, bottom = 12.dp)
+                .fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun FloatingText(
+    @StringRes stringRes: Int
+) {
+    Text(
+        text = stringResource(id = stringRes),
+        style = TextStyle(
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            shadow = Shadow(Color(0xFF000000), blurRadius = 3f),
+            color = MaterialTheme.colors.surface
+        ),textAlign = TextAlign.Center,
+        modifier = Modifier
+            .padding(start = 26.dp, end = 26.dp, top = 10.dp, bottom = 26.dp)
+            .fillMaxWidth()
+    )
+}
+
+@Composable
+fun SearchResultBar(
+    @StringRes stringRes: Int,
+    listSize: Int,
+    isOtherExtended: Boolean,
+    onExtendClick: () -> Unit,
+    rotationState: Float
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        if (isOtherExtended) {
+            if (listSize > 0) {
+                Text(
+                    text = stringResource(id = stringRes),
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    ),
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+            if (listSize >= 3) {
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = onExtendClick,modifier = Modifier.rotate(rotationState)) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.expand_less_icon),
+                        contentDescription = stringResource(R.string.expand_button_content_description),
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            }
+        }
+    }
+    if (listSize > 0) Divider(color = MaterialTheme.colors.surface)
+}
+
+fun compareString(
+    original: String,
+    target: String
+): Boolean {
+    if (original.length > target.length)
+        if (original.contains(target)) return true
+        else if (original.length == target.length) {
+            var cnt = 0
+            for (i in original.indices)
+                if (original[i] != target[i]) cnt++
+            if (cnt <= 1) return true
+        } else return target.contains(original)
+    return false
 }
