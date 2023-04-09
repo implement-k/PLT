@@ -1,28 +1,17 @@
 package com.cmon.pseudoLocationTracker.screen
 
-import android.content.ContentValues.TAG
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,16 +21,13 @@ import com.cmon.pseudoLocationTracker.*
 import com.cmon.pseudoLocationTracker.R
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.cmon.pseudoLocationTracker.composable.ReCheckDialog
-import com.cmon.pseudoLocationTracker.composable.RequestInfoDialog
-import com.cmon.pseudoLocationTracker.composable.SearchBar
-import com.cmon.pseudoLocationTracker.composable.bitmapDescriptorFromVector
 import com.cmon.pseudoLocationTracker.data.Pseudo
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.maps.android.compose.*
+import com.cmon.pseudoLocationTracker.composable.*
 
 var Point = LatLng(36.34, 127.77)
 var Zoom = 7f
@@ -196,7 +182,7 @@ fun HomeScreen(
             Row {
                 Spacer (modifier = Modifier.weight(1f))
                 PseudoCheckListButton(navController)
-                DropDownMenuButton(
+                PseudoDropDownMenuButton(
                     isDropDownMenuExtended = isDropDownMenuExtended,
                     onClick = { isDropDownMenuExtended = true },
                     onDismissRequest = { isDropDownMenuExtended = false },
@@ -260,174 +246,6 @@ fun HomeScreen(
                     isSearch = searchInput.isNotEmpty()
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun DropDownMenuButton(
-    isDropDownMenuExtended: Boolean,
-    onClick: () -> Unit,
-    onDismissRequest: () -> Unit,
-    navController: NavHostController,
-    focusManager: FocusManager,
-    db: FirebaseFirestore,
-    context: Context,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
-        shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.secondary,
-            contentColor = MaterialTheme.colors.onSecondary
-        ),
-        elevation = ButtonDefaults.elevation(
-            defaultElevation = 20.dp,
-            pressedElevation = 0.dp,
-            hoveredElevation = 0.dp,
-            focusedElevation = 0.dp),
-        modifier = modifier
-            .padding(top = 10.dp, bottom = 10.dp, end = 10.dp)
-            .size(height = 55.dp, width = 55.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.menu_icon),
-            contentDescription = stringResource(id = R.string.menu),
-            modifier = Modifier
-                .size(20.dp)
-                .padding(start = 0.dp, end = 0.dp)
-        )
-    }
-
-
-    DropdownMenu(
-        expanded = isDropDownMenuExtended,
-        onDismissRequest = onDismissRequest,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colors.background,
-                shape = RoundedCornerShape(20.dp)
-            )
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .shadow(elevation = 5.dp, CircleShape)
-            ){
-                Image(
-                    painter = painterResource(id = R.drawable.plt_app_icon),
-                    contentDescription = stringResource(id = R.string.app_name),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                )
-            }
-            Text(
-                text = stringResource(id = R.string.app_name),
-                style = MaterialTheme.typography.h2,
-                modifier = Modifier.padding(start = 10.dp)
-            )
-        }
-
-
-        DropDownMenuButton(
-            onClick = { navController.navigate("report_screen") },
-            loc = Loc.TOP, text = R.string.menu_report
-        )
-
-        val openDialog = remember { mutableStateOf(false) }
-        val openReCheckDialog = remember { mutableStateOf(false) }
-        var text by remember { mutableStateOf("") }
-
-        DropDownMenuButton(
-            onClick = { openDialog.value = true },
-            loc = Loc.MIDDLE, text = R.string.request_modify_info
-        )
-        RequestInfoDialog(
-            openDialog = openDialog.value,
-            onDismissRequest = { openDialog.value = false },
-            value = text,
-            onValueChange = { text = it },
-            keyboardAction = KeyboardActions(
-                onNext = { focusManager.clearFocus()}
-            ),
-            cancelClick = {
-                openDialog.value = false
-                text = ""},
-            okClick = {
-                openDialog.value = false
-                openReCheckDialog.value = true },
-            isTextEmpty =  text.isNotEmpty()
-        )
-        ReCheckDialog(
-            openDialog = openReCheckDialog.value,
-            onDismissRequest = { openReCheckDialog.value = false },
-            text = text,
-            editClick = {
-                openReCheckDialog.value = false
-                openDialog.value = true
-            },
-            okClick = {
-                openReCheckDialog.value = false
-                val request = hashMapOf(
-                    "request" to text
-                )
-
-                db.collection("information_modification_request")
-                    .add(request)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                        Toast.makeText(context, "요청 성공", Toast.LENGTH_SHORT).show()
-                        text = ""
-                    }
-                    .addOnFailureListener { e ->
-                        Log.w(TAG, "Error adding document", e)
-                        Toast.makeText(context, "요청 실패", Toast.LENGTH_SHORT).show()
-                    }
-
-            }
-        )
-
-        DropDownMenuButton(
-            onClick = { navController.navigate("criteria_screen") },
-            loc = Loc.BOTTOM, text = R.string.menu_standard
-        )
-
-        Button(
-            onClick = { navController.navigate("info_screen") },
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.background,
-                contentColor = MaterialTheme.colors.onBackground
-            ),
-            elevation = ButtonDefaults.elevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                hoveredElevation = 0.dp,
-                focusedElevation = 0.dp),
-            modifier = Modifier.padding(start = 10.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.info_icon),
-                contentDescription = stringResource(id = R.string.menu_info),
-                modifier = Modifier
-                    .size(15.dp)
-                    .padding(end = 4.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.menu_info),
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 10.sp
-                )
-            )
         }
     }
 }

@@ -80,7 +80,7 @@ fun CriteriaBodyText(
     @StringRes stringRes: Int
 ) {
     Text(
-        text = stringResource(id = R.string.criteria_pseudo),
+        text = stringResource(id = stringRes),
         style = MaterialTheme.typography.body1,
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
