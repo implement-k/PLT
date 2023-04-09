@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PseudoLocationTrackerTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
@@ -49,8 +48,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-val nullPseudo = Pseudo("","","","","","","", RelativeInstitutions = "", crime = "",source = "", locsource = "",latlng = LatLng(0.0,0.0),location = "")
-var Pseudo = nullPseudo
+val NULL_PSEUDO = Pseudo("","","","","","","", relativeInstitutions = "", crime = "",source = "", locsource = "",latlng = LatLng(0.0,0.0),location = "")
+var PSEUDO = NULL_PSEUDO
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -122,7 +121,7 @@ fun PLTapp(
                             explanation = document.get("detail").toString().replace("\\n", "\n"),
                             pseudo = document.get("pseudo").toString(),
                             address = addressList,
-                            RelativeInstitutions = document.get("RelatedInstitutions").toString().replace("\\n", "\n"),
+                            relativeInstitutions = document.get("RelatedInstitutions").toString().replace("\\n", "\n"),
                             crime = document.get("crime").toString().replace("\\n", "\n"),
                             source = document.get("source").toString(),
                             locsource = document.get("locsource").toString(),
@@ -163,7 +162,7 @@ fun PLTapp(
         composable("report_screen") { ReportScreen(navController, db) }
         composable("standard_screen") { StandardScreen(navController) }
         composable("info_screen") { InfoScreen(navController)}
-        composable("pseudo_info_screen") { PseudoInfoScreen(navController, Pseudo) }
+        composable("pseudo_info_screen") { PseudoInfoScreen(navController) }
         composable("first_screen") { FirstScreen() {
             preferences.edit().putBoolean(PREF_KEY_FIRST_LAUNCH, false).apply()
             navController.navigate("home_screen")

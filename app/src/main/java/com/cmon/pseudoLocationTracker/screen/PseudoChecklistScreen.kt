@@ -29,7 +29,7 @@ import com.cmon.pseudoLocationTracker.data.Pseudo
 import com.cmon.pseudoLocationTracker.ui.theme.md_theme_light_surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.cmon.pseudoLocationTracker.Pseudo
+import com.cmon.pseudoLocationTracker.PSEUDO
 import com.cmon.pseudoLocationTracker.composable.LoadingCard
 import com.cmon.pseudoLocationTracker.composable.TopBar
 import com.cmon.pseudoLocationTracker.ui.theme.md_theme_light_secondary
@@ -235,7 +235,7 @@ fun DetailInfo(
     Column{
         Row(modifier = Modifier.padding(10.dp)){
             Text(
-                text = stringResource(id = R.string.representative),
+                text = stringResource(id = R.string.pseudo_info_representative),
                 style = TextStyle(
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp
@@ -288,7 +288,7 @@ fun DetailInfo(
             Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = { navController.navigate("pseudo_info_screen")
-                          Pseudo= pseudo},
+                          PSEUDO= pseudo},
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.colors.background,

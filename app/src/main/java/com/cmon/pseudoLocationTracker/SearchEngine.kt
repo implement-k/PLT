@@ -208,7 +208,7 @@ fun PseudoResultCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = {
-                Pseudo = pseudo
+                PSEUDO = pseudo
                 navController.navigate("pseudo_info_screen")
             })
     ){
@@ -227,7 +227,7 @@ fun PseudoResultCard(
                 .fillMaxWidth()
         ){
             Text(
-                text = stringResource(id = R.string.representative),
+                text = stringResource(id = R.string.pseudo_info_representative),
                 style = TextStyle(
                     fontWeight = FontWeight.Normal,
                     fontSize = 11.sp

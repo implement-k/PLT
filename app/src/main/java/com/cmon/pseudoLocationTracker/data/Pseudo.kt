@@ -11,7 +11,7 @@ data class Pseudo (
     val explanation: String,
     val pseudo: String,
     val address: MutableList<PseudoAddress> = mutableListOf(),
-    val RelativeInstitutions: String,
+    val relativeInstitutions: String,
     val crime: String,
     val source: String,
     val locsource: String,

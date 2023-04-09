@@ -14,9 +14,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.cmon.pseudoLocationTracker.Pseudo
+import com.cmon.pseudoLocationTracker.NULL_PSEUDO
+import com.cmon.pseudoLocationTracker.PSEUDO
 import com.cmon.pseudoLocationTracker.R
-import com.cmon.pseudoLocationTracker.nullPseudo
 
 @Composable
 fun TopBar(
@@ -28,7 +28,7 @@ fun TopBar(
     ) {
         Button(
             onClick = { navController.navigateUp()
-                Pseudo = nullPseudo
+                PSEUDO = NULL_PSEUDO
             },
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(
