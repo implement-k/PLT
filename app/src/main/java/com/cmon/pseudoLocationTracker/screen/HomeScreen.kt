@@ -396,7 +396,7 @@ fun DropDownMenuButton(
         )
 
         DropDownMenuButton(
-            onClick = { navController.navigate("standard_screen") },
+            onClick = { navController.navigate("criteria_screen") },
             loc = Loc.BOTTOM, text = R.string.menu_standard
         )
 

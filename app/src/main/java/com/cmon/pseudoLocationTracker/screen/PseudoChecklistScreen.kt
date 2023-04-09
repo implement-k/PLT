@@ -57,7 +57,7 @@ fun PseudoChecklistScreen(
                         CaptionButton(onAllTrueChange, R.string.all_check)
                         CaptionButton(onAllFalseChange, R.string.all_false_check)
                         Button (
-                            onClick = { navController.navigate("standard_screen") },
+                            onClick = { navController.navigate("criteria_screen") },
                             shape = RoundedCornerShape(50),
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = MaterialTheme.colors.secondary,

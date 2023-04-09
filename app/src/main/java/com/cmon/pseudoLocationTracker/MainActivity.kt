@@ -160,7 +160,7 @@ fun PLTapp(
                 expandedList, checkedList,
                 onAllTrueChange, onAllFalseChange) }
         composable("report_screen") { ReportScreen(navController, db) }
-        composable("standard_screen") { StandardScreen(navController) }
+        composable("criteria_screen") { CriteriaScreen(navController) }
         composable("info_screen") { InfoScreen(navController)}
         composable("pseudo_info_screen") { PseudoInfoScreen(navController) }
         composable("first_screen") { FirstScreen() {
