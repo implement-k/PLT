@@ -1,8 +1,6 @@
 package com.cmon.pseudoLocationTracker.composable
 
-import android.content.ContentValues
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,7 +27,6 @@ import com.cmon.pseudoLocationTracker.Loc
 import com.cmon.pseudoLocationTracker.R
 import com.google.firebase.firestore.FirebaseFirestore
 import com.cmon.pseudoLocationTracker.DropDownMenuButton
-import com.cmon.pseudoLocationTracker.data.UpdateRequestModule
 
 @Composable
 fun PseudoDropDownMenuButton(
@@ -148,7 +145,7 @@ fun PseudoDropDownMenuButton(
                     isOpenReCheckDialog.value = false
                     val request = hashMapOf("request" to requestInput)
 
-                    UpdateRequestModule.UpdateRequest(request)
+
 
                     db.collection("information_modification_request")
                         .add(request)
