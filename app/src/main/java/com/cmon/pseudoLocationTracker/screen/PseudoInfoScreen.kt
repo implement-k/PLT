@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.cmon.pseudoLocationTracker.R
+import com.cmon.pseudoLocationTracker.composable.TopBar
 import com.cmon.pseudoLocationTracker.data.Pseudo
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

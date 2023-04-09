@@ -1,11 +1,10 @@
 package com.cmon.pseudoLocationTracker.screen
 
 import android.annotation.SuppressLint
-import android.content.Intent
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -21,18 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.cmon.pseudoLocationTracker.Pseudo
 import com.cmon.pseudoLocationTracker.R
-import com.cmon.pseudoLocationTracker.nullPseudo
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import com.google.api.Context
+import com.cmon.pseudoLocationTracker.composable.TopBar
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun InfoScreen(
-    navController: NavController
-) {
-
+fun InfoScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopBar(navController = navController)
@@ -77,59 +69,24 @@ fun InfoScreen(
                 }
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally){
-                Text(
-                    text = stringResource(id = R.string.inquiry),
-                    style = TextStyle(
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp
-                    ),
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 2.dp, top = 16.dp)
-                )
-                Text(
-                    text = stringResource(id = R.string.madyBy),
-                    style = TextStyle(
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp
-                    ),
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 2.dp)
-                )
+                InfoBottomText(stringRes = R.string.info_mail, isTop = true)
+                InfoBottomText(stringRes = R.string.madyBy, isTop = false)
             }
         }
     }
 }
 
 @Composable
-fun TopBar(
-    navController: NavController,
-    modifier: Modifier = Modifier
+fun InfoBottomText(
+    @StringRes stringRes: Int,
+    isTop: Boolean
 ) {
-    Row(
-        modifier = modifier
-    ) {
-        Button(
-            onClick = { navController.navigateUp()
-                      Pseudo = nullPseudo
-                      },
-            shape = CircleShape,
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondary,
-                contentColor = MaterialTheme.colors.onSecondary
-            ),
-            elevation = ButtonDefaults.elevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                hoveredElevation = 0.dp,
-                focusedElevation = 0.dp),
-            modifier = Modifier
-                .padding(16.dp)
-                .size(width = 55.dp, height = 55.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_back_icon),
-                contentDescription = stringResource(id = R.string.back),
-                modifier = Modifier
-                    .size(50.dp)
-            )
-        }
-    }
+    Text(
+        text = stringResource(id = stringRes),
+        style = TextStyle(
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp
+        ),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = if (isTop) 2.dp else 16.dp, top = if (isTop) 16.dp else 2.dp)
+    )
 }

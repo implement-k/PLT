@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -26,8 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -37,16 +34,17 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.cmon.pseudoLocationTracker.composable.ReCheckDialog
 import com.cmon.pseudoLocationTracker.composable.RequestInfoDialog
+import com.cmon.pseudoLocationTracker.composable.SearchBar
 import com.cmon.pseudoLocationTracker.composable.bitmapDescriptorFromVector
 import com.cmon.pseudoLocationTracker.data.Pseudo
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.maps.android.compose.*
 
 var Point = LatLng(36.34, 127.77)
 var Zoom = 7f
-
 
 @Composable
 fun HomeScreen(
@@ -55,21 +53,15 @@ fun HomeScreen(
     pseudoList: SnapshotStateList<Pseudo>,
     checkedList: SnapshotStateList<Boolean>
 ) {
+    val context = LocalContext.current
+    val focusManager: FocusManager = LocalFocusManager.current
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(Point, Zoom)
     }
-    val focusManager = LocalFocusManager.current
+
+
     var searchInput by remember { mutableStateOf("") }
-
-    var isDropDownMenuExtended by remember { mutableStateOf(false) }
-
-    val context = LocalContext.current
-
-    val options = GoogleMapOptions()
-    options.compassEnabled(false)
-        .tiltGesturesEnabled(false)
-        .liteMode(true)
-
     var searchReligionExtended by remember { mutableStateOf(false) }
     var searchChurchExtended by remember { mutableStateOf(false) }
     val rRotationState by animateFloatAsState(
@@ -79,6 +71,13 @@ fun HomeScreen(
         targetValue = if (searchChurchExtended) 180f else 0f
     )
 
+    var isDropDownMenuExtended by remember { mutableStateOf(false) }
+
+    val options = GoogleMapOptions()
+    options.compassEnabled(false)
+        .tiltGesturesEnabled(false)
+        .liteMode(true)
+
     var isMoved by remember { mutableStateOf(false) }
 
     Box{
@@ -87,20 +86,26 @@ fun HomeScreen(
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
                 isIndoorEnabled = false,
-                minZoomPreference = 7f
+                minZoomPreference = 7f,
+                latLngBoundsForCameraTarget = LatLngBounds(LatLng(32.633855539005914, 125.38502187544947),LatLng(39.23754092085378, 131.6586979462642))
             ),
             uiSettings = MapUiSettings(
                 tiltGesturesEnabled = false
             )
         ) {
+            val markerIcon = bitmapDescriptorFromVector(
+                context, R.drawable.maker_default
+            )
+            val headquartersMarkerIcon = bitmapDescriptorFromVector(
+                context, R.drawable.marker_headquarters
+            )
+
             for ((i, pseudo) in pseudoList.withIndex()){
-                if (checkedList[i]) {
+                if (checkedList[i])  {
                     for (address in pseudo.address) {
                         MarkerInfoWindow(
                             state = MarkerState(position = address.latlng),
-                            icon = bitmapDescriptorFromVector(
-                                context, R.drawable.default_marker
-                            ),
+                            icon = markerIcon,
                         ){
                             Column(
                                 modifier = Modifier
@@ -144,9 +149,7 @@ fun HomeScreen(
                     }
                     MarkerInfoWindow(
                         state = MarkerState(position = pseudo.latlng),
-                        icon = bitmapDescriptorFromVector(
-                            context, R.drawable.marker_home
-                        ),
+                        icon = headquartersMarkerIcon,
                         onInfoWindowClick = {
 
                         }
@@ -425,76 +428,6 @@ fun DropDownMenuButton(
                     fontSize = 10.sp
                 )
             )
-        }
-    }
-}
-
-
-@Composable
-fun SearchBar(
-    keyboardActions: KeyboardActions,
-    value: String,
-    onValueChange: (String) -> Unit,
-    onCancelClick: () -> Unit,
-    isSearch: Boolean
-) {
-    val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
-        focusedBorderColor = MaterialTheme.colors.secondary,
-        unfocusedBorderColor =  MaterialTheme.colors.surface ,
-        backgroundColor =  MaterialTheme.colors.surface )
-
-    Box(
-        contentAlignment = Alignment.CenterEnd,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 10.dp)
-            .height(60.dp)
-            .shadow(elevation = 20.dp, RoundedCornerShape(20.dp)),
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = { Text(
-                text = stringResource(id = R.string.search_label),
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp
-                ),
-            ) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = keyboardActions,
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.search_icon),
-                    contentDescription = stringResource(id = R.string.search),
-                    modifier = Modifier
-                        .size(20.dp)
-                )
-            },
-            shape = RoundedCornerShape(50),
-            colors = textFieldColors,
-            textStyle = TextStyle(lineHeight = 10.sp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-
-        )
-        if (isSearch) {
-            IconButton(
-                onClick = onCancelClick,
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .size(20.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.close_icon),
-                    contentDescription = null,
-                )
-            }
         }
     }
 }

@@ -17,7 +17,9 @@ data class Pseudo (
     val locsource: String,
     val latlng: LatLng,
     val location: String
-)
+) {
+    var isExtended = false
+}
 
 data class PseudoAddress (
     val pseudoName: String,

@@ -15,7 +15,7 @@
     <string name="recheck_text">다음의 정보가 맞나요?</string>
     <string name="edit">수정</string>
     <string name="version">"버전 : "</string>
-    <string name="inquiry">문의 : implement0703@gmail.com</string>
+    <string name="info_mail">문의 : implement0703@gmail.com</string>
     <string name="madyBy">made by implement</string>
     <string name="open_source_info">오픈 소스 정보</string>
     <string name="report_explanation1">정확한 정보를 입력해주세요.</string>
