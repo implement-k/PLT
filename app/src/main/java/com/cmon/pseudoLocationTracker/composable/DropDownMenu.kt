@@ -165,34 +165,59 @@ fun PseudoDropDownMenuButton(
             loc = Loc.BOTTOM, text = R.string.menu_standard
         )
 
-        Button(
-            onClick = { navController.navigate("info_screen") },
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.background,
-                contentColor = MaterialTheme.colors.onBackground
-            ),
-            elevation = ButtonDefaults.elevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                hoveredElevation = 0.dp,
-                focusedElevation = 0.dp),
-            modifier = Modifier.padding(start = 10.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.info_icon),
-                contentDescription = stringResource(id = R.string.menu_info),
-                modifier = Modifier
-                    .size(15.dp)
-                    .padding(end = 4.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.menu_info),
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 10.sp
+        Row{
+            Button(
+                onClick = { navController.navigate("info_screen") },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = MaterialTheme.colors.onBackground
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp),
+                modifier = Modifier.padding(start = 10.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.info_icon),
+                    contentDescription = stringResource(id = R.string.menu_info),
+                    modifier = Modifier
+                        .size(15.dp)
+                        .padding(end = 4.dp)
                 )
-            )
+                Text(
+                    text = stringResource(id = R.string.menu_info),
+                    style = TextStyle(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 10.sp
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = { navController.navigate("law_screen") },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = MaterialTheme.colors.onBackground
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp),
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+            ){
+                Text(
+                    text = stringResource(id = R.string.law3),
+                    style = TextStyle(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 10.sp
+                    )
+                )
+            }
         }
     }
 }

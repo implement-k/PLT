@@ -97,6 +97,7 @@ fun PLTapp(
             navController.navigate("home_screen")
         }
         }
+        composable("law_screen") {LawScreen(navController) }
     }
     if (isFirstLaunch) {
         navController.navigate("first_screen")

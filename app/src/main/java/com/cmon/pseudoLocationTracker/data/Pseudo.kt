@@ -12,11 +12,12 @@ data class Pseudo (
     val pseudo: String = "",
     val address: MutableList<PseudoAddress> = mutableListOf(),
     val relativeInstitutions: String = "",
-    val crime: String = "",
+    val criteria: String = "",
     val source: String = "",
     val locsource: String = "",
     val latlng: LatLng = LatLng(0.0,0.0),
-    val location: String = ""
+    val location: String = "",
+    val criteriaReason: String = ""
 )
 
 data class PseudoAddress (

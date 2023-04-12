@@ -10,7 +10,8 @@ import com.cmon.pseudoLocationTracker.R
 
 val Noto = FontFamily(
     Font(R.font.notosans_regular, FontWeight.Normal),
-    Font(R.font.notosans_bold, FontWeight.Bold)
+    Font(R.font.notosans_bold, FontWeight.Bold),
+    Font(R.font.notosans_black, FontWeight.ExtraBold)
 )
 
 val Typography = Typography(

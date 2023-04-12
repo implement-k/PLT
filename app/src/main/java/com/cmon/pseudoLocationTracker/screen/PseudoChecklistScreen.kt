@@ -137,7 +137,14 @@ fun PseudoChecklistScreen(
                                 checked = checkedList[index],
                                 onCheckedChange = { checkedList[index] = !checkedList[index]},
                                 expanded = expandedList[index],
-                                onClick = { expandedList[index] = !expandedList[index] },
+                                onClick = {
+                                    expandedList[index] = !expandedList[index]
+                                    for (i in 0 until expandedList.size){
+                                        if (i != index){
+                                            expandedList[i] = false
+                                        }
+                                    }
+                                          },
                                 pseudo = item,
                                 index = index,
                                 listSize = pseudoList.size,
@@ -276,7 +283,7 @@ fun DetailInfo(
                 )
             )
             Text(
-                text = pseudo.explanation,
+                text = pseudo.criteria,
                 style = TextStyle(
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp

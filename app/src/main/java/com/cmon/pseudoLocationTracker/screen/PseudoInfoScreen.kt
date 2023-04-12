@@ -19,6 +19,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
@@ -50,6 +51,7 @@ fun PseudoInfoScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
+            PseudoInfoRedText(stringRes = R.string.law2)
             Text(
                 text = PSEUDO.pseudoName,
                 style = TextStyle(
@@ -99,12 +101,18 @@ fun PseudoInfoScreen(
                 PseudoInfoBodyText(text = PSEUDO.organization)
             }
 
-            PseudoInfoHeadText(stringRes = R.string.pseudo_info_crime, top = 16.dp)
-            PseudoInfoBodyText(text = PSEUDO.crime)
-
             if (PSEUDO.relativeInstitutions != "null") {
                 PseudoInfoHeadText(stringRes = R.string.pseudo_info_relativeInstitutions, top = 16.dp)
                 PseudoInfoBodyText(text = PSEUDO.relativeInstitutions)
+            }
+
+            PseudoInfoHeadText(stringRes = R.string.pseudo_info_criteria, top = 16.dp)
+            PseudoInfoBodyText(text = PSEUDO.criteria)
+
+            Column(
+                modifier = Modifier.padding(start = 20.dp,end = 20.dp, top = 10.dp, bottom = 5.dp)
+            ) {
+                PseudoInfoCaptionText(text = PSEUDO.criteriaReason)
             }
 
             Column(
@@ -118,6 +126,30 @@ fun PseudoInfoScreen(
         }
     }
 }
+
+@Composable
+fun PseudoInfoRedText(
+    @StringRes stringRes: Int
+) {
+    Text(
+        text = stringResource(id = stringRes),
+        style = TextStyle(
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            color = Color(0xFFAE3039)
+        ),
+        lineHeight = 20.sp,
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize()
+            .background(
+                color = Color(0xFFF5DBDD),
+                shape = RoundedCornerShape(20.dp)
+            )
+            .padding(16.dp)
+    )
+}
+
 
 @Composable
 fun PseudoInfoCaption2Text(

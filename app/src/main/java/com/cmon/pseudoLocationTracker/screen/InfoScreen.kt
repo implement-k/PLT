@@ -63,7 +63,7 @@ fun InfoScreen(navController: NavController) {
                         style = MaterialTheme.typography.caption
                     )
                     Text(
-                        text = "1.0.0",
+                        text = "1.0.1",
                         style = MaterialTheme.typography.caption
                     )
                 }

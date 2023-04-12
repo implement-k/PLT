@@ -71,11 +71,12 @@ fun LoadingData(
                             pseudo = pseudoDocument.get("pseudo").toString(),
                             address = addressList,
                             relativeInstitutions = pseudoDocument.get("RelatedInstitutions").toString().replace("\\n", "\n"),
-                            crime = pseudoDocument.get("crime").toString().replace("\\n", "\n"),
+                            criteria = pseudoDocument.get("criteria").toString().replace("\\n", "\n"),
                             source = pseudoDocument.get("source").toString(),
                             locsource = pseudoDocument.get("locsource").toString(),
                             latlng = LatLng(lat, lng),
-                            location = pseudoDocument.get("location").toString()
+                            location = pseudoDocument.get("location").toString(),
+                            criteriaReason = pseudoDocument.get("criteriaReason").toString(),
                         ))
                     checkedList.add(true)
                     expandedList.add(false)
